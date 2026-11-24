@@ -1,0 +1,110 @@
+name: Test, Build and Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+env:
+  RENDER_SERVICE_URL: https://dfa-hosptal-appoinment-application.onrender.com
+
+jobs:
+  test:
+    name: Test application
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Run backend tests
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          JWT_SECRET: ci-only-secret-that-is-long-enough-for-tests
+        run: npm test
+
+  build:
+    name: Build application
+    runs-on: ubuntu-latest
+    needs: test
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+  deploy:
+    name: Deploy application
+    runs-on: ubuntu-latest
+    needs: [test, build]
+    timeout-minutes: 10
+    steps:
+      - name: Verify Render deploy hook is configured
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "Configure the RENDER_DEPLOY_HOOK_URL repository secret in GitHub."
+            exit 1
+          fi
+
+      - name: Trigger Render deployment
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            "$RENDER_DEPLOY_HOOK_URL"
+
+          echo "Render deploy requested for [$RENDER_SERVICE_URL]($RENDER_SERVICE_URL)." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Wait for backend health
+        run: |
+          for attempt in $(seq 1 30); do
+            response=$(curl --silent --show-error --fail "$RENDER_SERVICE_URL/api/health" || true)
+
+            if printf '%s' "$response" | jq -e '.database.connected == true' >/dev/null 2>&1; then
+              echo "$response"
+              echo "Backend is healthy at [$RENDER_SERVICE_URL]($RENDER_SERVICE_URL)." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+
+            echo "Waiting for Render backend health (attempt $attempt/30)..."
+            sleep 10
+          done
+
+          echo "Backend did not report a connected database within 5 minutes." >&2
+          exit 1
