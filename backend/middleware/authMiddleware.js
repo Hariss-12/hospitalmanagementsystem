@@ -90,10 +90,7 @@ async function authenticate(req, res, next) {
       doctorProfileId,
       jti: decoded.jti,
     };
-<<<<<<< HEAD
     req.authenticatedUser = user;
-=======
->>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 
     next();
   } catch (err) {

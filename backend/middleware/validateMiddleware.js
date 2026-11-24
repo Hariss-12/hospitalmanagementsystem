@@ -14,7 +14,7 @@ function securityHeaders(req, res, next) {
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' http://localhost:* https://dfa-hosptal-appoinment-application.onrender.com;"
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' http://localhost:*;"
   );
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
@@ -39,10 +39,7 @@ function corsMiddleware(req, res, next) {
     'Content-Type, Authorization, X-CSRF-Token, X-Requested-With'
   );
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-<<<<<<< HEAD
   res.setHeader('Access-Control-Max-Age', '600');
-=======
->>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 
   if (req.method === 'OPTIONS') {
     return res.status(204).send('');
