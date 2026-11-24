@@ -2,18 +2,13 @@
  * Centralized Axios HTTP Client (`src/api/axiosClient.js`)
  *
  * Configures:
-<<<<<<< HEAD
  * - Base URL from VITE_API_URL, VITE_API_BASE_URL, or `/api`
-=======
- * - Base URL from VITE_API_BASE_URL or `/api`
->>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
  * - Automatic Bearer JWT header attachment
  * - Standardized error extraction for HTTP 409 DFA transition conflicts, 401/403 RBAC errors, and validation messages
  */
 
 import axios from 'axios';
 
-<<<<<<< HEAD
 const configuredApiUrl =
   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) ||
   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL);
@@ -24,21 +19,13 @@ const API_BASE_URL = normalizedApiUrl
     ? normalizedApiUrl
     : `${normalizedApiUrl}/api`
   : '/api';
-=======
-const API_BASE_URL =
-  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) ||
-  '/api';
->>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 
 const axiosClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
-<<<<<<< HEAD
-=======
   headers: {
     'Content-Type': 'application/json',
   },
->>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 });
 
 axiosClient.interceptors.request.use(

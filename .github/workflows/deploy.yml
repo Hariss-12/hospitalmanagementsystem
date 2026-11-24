@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  RENDER_SERVICE_URL: https://dfa-hosptal-appoinment-application.onrender.com
+  RENDER_SERVICE_URL: ${{ vars.RENDER_SERVICE_URL }}
 
 jobs:
   test:
@@ -80,6 +80,17 @@ jobs:
             echo "Configure the RENDER_DEPLOY_HOOK_URL repository secret in GitHub."
             exit 1
           fi
+          if [ -z "$RENDER_SERVICE_URL" ]; then
+            echo "Configure the RENDER_SERVICE_URL repository variable in GitHub."
+            exit 1
+          fi
+          case "$RENDER_SERVICE_URL" in
+            https://*) ;;
+            *)
+              echo "RENDER_SERVICE_URL must be an HTTPS URL."
+              exit 1
+              ;;
+          esac
 
       - name: Trigger Render deployment
         env:
@@ -93,12 +104,14 @@ jobs:
 
       - name: Wait for backend health
         run: |
+          service_url="${RENDER_SERVICE_URL%/}"
+
           for attempt in $(seq 1 30); do
-            response=$(curl --silent --show-error --fail "$RENDER_SERVICE_URL/api/health" || true)
+            response=$(curl --silent --show-error --fail "$service_url/api/health" || true)
 
             if printf '%s' "$response" | jq -e '.database.connected == true' >/dev/null 2>&1; then
               echo "$response"
-              echo "Backend is healthy at [$RENDER_SERVICE_URL]($RENDER_SERVICE_URL)." >> "$GITHUB_STEP_SUMMARY"
+              echo "Backend is healthy at [$service_url]($service_url)." >> "$GITHUB_STEP_SUMMARY"
               exit 0
             fi
 

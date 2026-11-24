@@ -1,13 +1,7 @@
-<<<<<<< HEAD
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axiosClient from '../api/axiosClient';
-=======
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
->>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -18,7 +12,6 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-<<<<<<< HEAD
   // Wake a sleeping hosted API while the user enters their credentials. This
   // avoids making the login request pay the entire cold-start delay.
   useEffect(() => {
@@ -27,8 +20,6 @@ export default function LoginPage() {
     });
   }, []);
 
-=======
->>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
