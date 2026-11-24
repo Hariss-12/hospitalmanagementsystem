@@ -1,12 +1,18 @@
+<<<<<<< HEAD
 
 /**
  * Online Hospital Appointment Management System Using DFA
  * Express Application & Server
+=======
+/**
+ * Online Hospital Appointment Management System Using DFA — Express Application & Server
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
  */
 
 const express = require('express');
 const fs = require('node:fs');
 const path = require('node:path');
+<<<<<<< HEAD
 
 const ENV = require('./config/env');
 
@@ -16,11 +22,16 @@ const {
   mongoose,
 } = require('./config/db');
 
+=======
+const ENV = require('./config/env');
+const { connectDB, mongoose } = require('./config/db');
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 const {
   securityHeaders,
   corsMiddleware,
   sanitizeInputMiddleware,
 } = require('./middleware/validateMiddleware');
+<<<<<<< HEAD
 
 const { apiRateLimiter } = require('./middleware/rateLimiter');
 
@@ -32,6 +43,11 @@ const {
 const {
   getDFADefinition,
 } = require('./controllers/appointmentController');
+=======
+const { apiRateLimiter } = require('./middleware/rateLimiter');
+const { notFoundHandler, errorHandler } = require('./middleware/errorHandler');
+const { getDFADefinition } = require('./controllers/appointmentController');
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 
 const authRoutes = require('./routes/authRoutes');
 const doctorRoutes = require('./routes/doctorRoutes');
@@ -40,6 +56,7 @@ const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
+<<<<<<< HEAD
 // Prevent duplicate server startup within this module.
 let activeServer = null;
 let isStarting = false;
@@ -62,18 +79,33 @@ app.use('/api', apiRateLimiter);
 // 2. Health Check Endpoint
 // --------------------------------------------------
 
+=======
+// 1. Security & Parsing Middleware
+app.use(securityHeaders);
+app.use(corsMiddleware);
+app.use(express.json({ limit: '256kb' }));
+app.use(sanitizeInputMiddleware);
+app.use('/api', apiRateLimiter);
+
+// 2. Phase 1 Health-Check & Formal DFA Definition Endpoints
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 app.get('/api/health', (_req, res) => {
   res.status(200).json({
     success: true,
     status: 'OK',
+<<<<<<< HEAD
 
     service:
       'Online Hospital Appointment Management System (DFA Engine)',
 
+=======
+    service: 'Online Hospital Appointment Management System (DFA Engine)',
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
     database: {
       connected: mongoose.connection.readyState === 1,
       name: mongoose.connection.name,
     },
+<<<<<<< HEAD
 
     dfaStates: [
       'REQUESTED',
@@ -84,10 +116,14 @@ app.get('/api/health', (_req, res) => {
       'COMPLETED',
     ],
 
+=======
+    dfaStates: ['REQUESTED', 'CONFIRMED', 'RESCHEDULED', 'CANCELLED', 'REJECTED', 'COMPLETED'],
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
     timestamp: new Date().toISOString(),
   });
 });
 
+<<<<<<< HEAD
 // --------------------------------------------------
 // 3. DFA Definition Endpoint
 // --------------------------------------------------
@@ -98,11 +134,17 @@ app.get('/api/dfa/definition', getDFADefinition);
 // 4. Application Routes
 // --------------------------------------------------
 
+=======
+app.get('/api/dfa/definition', getDFADefinition);
+
+// 3. Domain Routes
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 app.use('/api/auth', authRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/admin', adminRoutes);
 
+<<<<<<< HEAD
 // --------------------------------------------------
 // 5. Serve React Frontend
 // --------------------------------------------------
@@ -330,6 +372,49 @@ if (require.main === module) {
 // 10. Module Exports
 // --------------------------------------------------
 
+=======
+// Serve the built React application from the same Render web service when present.
+const frontendDist = path.resolve(__dirname, '..', 'frontend', 'dist');
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  app.get('*', (req, res, next) => {
+    if (req.path === '/api' || req.path.startsWith('/api/')) {
+      return next();
+    }
+    return res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+}
+
+// 4. Centralized 404 & Error Handling
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+async function startServer(port = ENV.PORT, options = {}) {
+  await connectDB(options);
+  return new Promise((resolve) => {
+    const server = app.listen(port, '0.0.0.0', () => {
+      resolve(server);
+    });
+  });
+}
+
+if (require.main === module) {
+  const { seedDatabase } = require('./utils/seed');
+  startServer(ENV.PORT)
+    .then(async (server) => {
+      await seedDatabase({ forceReset: false });
+      const addr = server.address();
+      console.log(
+        `[Hospital DFA Backend] Server listening on 0.0.0.0:${addr.port} (DB readyState=${mongoose.connection.readyState})`
+      );
+    })
+    .catch((err) => {
+      console.error('Failed to start server:', err);
+      process.exit(1);
+    });
+}
+
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 module.exports = {
   app,
   startServer,

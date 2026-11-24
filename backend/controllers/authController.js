@@ -247,7 +247,17 @@ async function logout(req, res, next) {
  */
 async function getMe(req, res, next) {
   try {
+<<<<<<< HEAD
     const user = req.authenticatedUser;
+=======
+    const user = await User.findById(req.user.id).lean();
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'User not found.', code: 'USER_NOT_FOUND' },
+      });
+    }
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 
     let doctorProfile = null;
     if (user.role === USER_ROLES.DOCTOR) {

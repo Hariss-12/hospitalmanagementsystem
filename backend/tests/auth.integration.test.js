@@ -9,7 +9,10 @@ const { startServer } = require('../server');
 const { disconnectDB } = require('../config/db');
 const { seedDatabase } = require('../utils/seed');
 const { apiRateLimiter, authRateLimiter } = require('../middleware/rateLimiter');
+<<<<<<< HEAD
 const User = require('../models/User');
+=======
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 
 let server;
 let baseUrl;
@@ -52,6 +55,7 @@ test('Phase 1 & Phase 2 Integration: Health Check, Registration, Login, Logout, 
     assert.equal(res.data.dfaStates.length, 6);
   });
 
+<<<<<<< HEAD
   await t.test('1a. Cross-origin preflight responses can be cached', async () => {
     const res = await api('/auth/login', {
       method: 'OPTIONS',
@@ -65,6 +69,8 @@ test('Phase 1 & Phase 2 Integration: Health Check, Registration, Login, Logout, 
     assert.equal(res.headers.get('access-control-max-age'), '600');
   });
 
+=======
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
   await t.test('2. Patient Registration hashes password, never exposes passwordHash, and ignores role spoofing', async () => {
     const res = await api('/auth/register', {
       method: 'POST',
@@ -130,6 +136,7 @@ test('Phase 1 & Phase 2 Integration: Health Check, Registration, Login, Logout, 
     });
     const token = loginRes.data.data.token;
 
+<<<<<<< HEAD
     const originalFindById = User.findById;
     let userLookups = 0;
     User.findById = function (...args) {
@@ -144,6 +151,10 @@ test('Phase 1 & Phase 2 Integration: Health Check, Registration, Login, Logout, 
     }
     assert.equal(meBefore.status, 200);
     assert.equal(userLookups, 1, 'GET /auth/me should use the user loaded by authentication middleware');
+=======
+    const meBefore = await api('/auth/me', { token });
+    assert.equal(meBefore.status, 200);
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 
     const logoutRes = await api('/auth/logout', { method: 'POST', token });
     assert.equal(logoutRes.status, 200);

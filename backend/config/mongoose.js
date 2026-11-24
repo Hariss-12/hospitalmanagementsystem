@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 /**
  * Mongoose Database Adapter
@@ -30,3 +31,9 @@ try {
 }
 
 module.exports = mongoose;
+=======
+const ENV = require('./env');
+
+module.exports =
+  ENV.USE_LOCAL_DB || ENV.NODE_ENV === 'test' ? require('./localMongoose') : require('mongoose');
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5

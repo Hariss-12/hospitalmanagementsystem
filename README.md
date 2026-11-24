@@ -54,8 +54,11 @@ using the local JSON store.
 For the deployed GitHub Pages frontend, configure the Render backend's `CORS_ORIGIN`
 environment variable to include `https://hariss-12.github.io` (the origin has no
 repository path). The backend's default CSP also permits the configured Render API host.
+<<<<<<< HEAD
 Set `VITE_API_URL` in `frontend/.env` for local frontend builds. Vite does not read
 `backend/.env`; the Pages workflow sets this variable to the active Render API host.
+=======
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
 
 ### Run All Automated Test Suites (DFA Unit, Auth, Integration, Security Audit, 15-Step E2E)
 ```bash

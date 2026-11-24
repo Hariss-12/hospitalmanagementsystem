@@ -37,7 +37,11 @@ jobs:
       - name: Build frontend for GitHub Pages
         working-directory: frontend
         env:
+<<<<<<< HEAD
           VITE_API_URL: https://dfa-hosptal-appoinment-application.onrender.com
+=======
+          VITE_API_BASE_URL: https://dfa-hosptal-appoinment-application.onrender.com/api
+>>>>>>> ce80f239edc9e0b467abb27280f2a6646f4c47a5
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
         run: |
           npm run build
