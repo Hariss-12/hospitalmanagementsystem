@@ -54,6 +54,22 @@ jobs:
               exit 1
               ;;
           esac
+          service_url="${RENDER_SERVICE_URL%/}"
+          health=$(curl --silent --show-error --fail --retry 5 --retry-connrefused --retry-delay 10 --retry-max-time 90 "$service_url/api/health")
+          if ! printf '%s' "$health" | jq -e '.success == true and .service == "Online Hospital Appointment Management System (DFA Engine)" and .database.connected == true' >/dev/null; then
+            echo "RENDER_SERVICE_URL did not return the connected Hospital DFA backend health response."
+            exit 1
+          fi
+          doctors=$(curl --silent --show-error --fail "$service_url/api/doctors")
+          if ! printf '%s' "$doctors" | jq -e '.success == true and (.data.doctors | type == "array")' >/dev/null; then
+            echo "RENDER_SERVICE_URL did not return the Hospital DFA doctors API response."
+            exit 1
+          fi
+          dfa=$(curl --silent --show-error --fail "$service_url/api/dfa/definition")
+          if ! printf '%s' "$dfa" | jq -e '.success == true and (.data.transitions | length == 11)' >/dev/null; then
+            echo "RENDER_SERVICE_URL did not return the Hospital DFA definition."
+            exit 1
+          fi
           npm run build
           cp dist/index.html dist/404.html
 

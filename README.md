@@ -237,23 +237,21 @@ These are demo credentials only. Do not retain them in a production deployment.
 
 ### GitHub Pages frontend
 
-The intended Pages URL for this repository is `https://hariss-12.github.io/hospitalmanagementsystem/`. In repository settings, set **Pages → Build and deployment → Source** to **GitHub Actions**. The workflow builds `frontend/dist`, sets the repository-specific Vite base path, copies `index.html` to `404.html` for SPA route fallback, and deploys that artifact.
+The intended Pages URL for this repository is `https://hariss-12.github.io/hospitalmanagementsystem/`. In repository settings, set **Pages → Build and deployment → Source** to **GitHub Actions**. The workflow verifies the configured backend health, doctor list, and DFA definition, then builds `frontend/dist`, sets the repository-specific Vite base path, copies `index.html` to `404.html` for SPA route fallback, and deploys that artifact.
 
 Set the GitHub Actions repository variable `RENDER_SERVICE_URL` to the **verified** backend origin (for example, the service's Render origin, without `/api`). The workflow passes it to Vite as `VITE_API_URL`. A Render URL is not hard-coded here because the available service URLs have not been verified to expose this application's API.
 
 ### Render backend
 
-The repository is a monorepo. For one Render Web Service that serves both the frontend build and API, use:
-
 | Render setting | Value |
 | --- | --- |
-| Root Directory | Leave blank (repository root) |
-| Build Command | `npm ci --prefix backend && npm ci --prefix frontend && npm run build --prefix frontend` |
-| Start Command | `npm start --prefix backend` |
+| Root Directory | `backend` |
+| Build Command | `npm ci` |
+| Start Command | `npm start` |
 
-Configure `MONGODB_URI`, `USE_LOCAL_DB=false`, `JWT_SECRET`, `NODE_ENV=production`, and `CORS_ORIGIN` in the Render service environment. Include `https://hariss-12.github.io` as an allowed origin when using the Pages frontend; the origin does not include the repository path. Render supplies `PORT`.
+The frontend is deployed separately to GitHub Pages; Render runs the backend only. Configure `MONGODB_URI`, `USE_LOCAL_DB=false`, `JWT_SECRET`, `NODE_ENV=production`, and `CORS_ORIGIN` in the Render service environment. Include `https://hariss-12.github.io` as an allowed origin when using the Pages frontend; the origin does not include the repository path. Render supplies `PORT`.
 
-For automated deployment, set the GitHub Actions repository variable `RENDER_SERVICE_URL` to the verified Render origin and the repository secret `RENDER_DEPLOY_HOOK_URL` to that service's deploy hook. The deployment workflow checks `/api/health` and requires `database.connected` to be `true`.
+For automated deployment, set the GitHub Actions repository variable `RENDER_SERVICE_URL` to the verified Render origin and the repository secret `RENDER_DEPLOY_HOOK_URL` to that service's deploy hook. The deployment workflow verifies the Hospital DFA service identity, database connection, doctors and DFA APIs, expected unauthenticated responses from appointment/auth/admin routes, and GitHub Pages CORS access.
 
 ### Deployment verification
 
