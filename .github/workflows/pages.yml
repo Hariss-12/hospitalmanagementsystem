@@ -39,8 +39,8 @@ jobs:
       - name: Build frontend for GitHub Pages
         working-directory: frontend
         env:
-          RENDER_SERVICE_URL: ${{ vars.RENDER_SERVICE_URL }}
-          VITE_API_URL: ${{ vars.RENDER_SERVICE_URL }}
+          RENDER_SERVICE_URL: ${{ vars.RENDER_SERVICE_URL || 'https://hostel-management-qr6f.onrender.com' }}
+          VITE_API_URL: ${{ vars.RENDER_SERVICE_URL || 'https://hostel-management-qr6f.onrender.com' }}
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
         run: |
           if [ -z "$RENDER_SERVICE_URL" ]; then

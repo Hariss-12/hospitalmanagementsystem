@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  RENDER_SERVICE_URL: ${{ vars.RENDER_SERVICE_URL }}
+  RENDER_SERVICE_URL: ${{ vars.RENDER_SERVICE_URL || 'https://hostel-management-qr6f.onrender.com' }}
 
 jobs:
   test:

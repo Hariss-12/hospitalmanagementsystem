@@ -239,7 +239,7 @@ These are demo credentials only. Do not retain them in a production deployment.
 
 The optional Pages URL for this repository is `https://hariss-12.github.io/hospitalmanagementsystem/`. In repository settings, set **Pages → Build and deployment → Source** to **GitHub Actions**. The workflow verifies the configured backend health, doctor list, and DFA definition, then builds `frontend/dist`, sets the repository-specific Vite base path, copies `index.html` to `404.html` for SPA route fallback, and deploys that artifact.
 
-To use Pages alongside the Render-hosted app, set the GitHub Actions repository variable `RENDER_SERVICE_URL` to the Render origin (without `/api`). The workflow passes it to Vite as `VITE_API_URL`; the Render-hosted frontend itself uses relative `/api` requests.
+To use Pages alongside the Render-hosted app, the Pages workflow uses the Render origin (override it with the GitHub Actions repository variable `RENDER_SERVICE_URL` if the hostname changes). It passes that origin to Vite as `VITE_API_URL`; the Render-hosted frontend itself uses relative `/api` requests.
 
 ### Render full-stack service
 
