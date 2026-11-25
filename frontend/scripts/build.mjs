@@ -17,6 +17,7 @@ const srcDir = path.join(rootDir, 'src');
 
 const REQUIRED_FILES = [
   'api/axiosClient.js',
+  'index.css',
   'context/AuthContext.jsx',
   'components/HospitalComponents.jsx',
   'pages/LandingPage.jsx',
