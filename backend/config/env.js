@@ -86,6 +86,9 @@ const ENV = {
         .split(',')
         .map((origin) => origin.trim())
         .filter(Boolean),
+      ...(process.env.RENDER_EXTERNAL_URL
+        ? [process.env.RENDER_EXTERNAL_URL.replace(/\/+$/, '')]
+        : []),
       'https://hariss-12.github.io',
     ]),
   ].join(','),

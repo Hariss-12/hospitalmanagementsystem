@@ -177,7 +177,7 @@ Create `backend/.env` from `backend/.env.example` and set values locally. In Ren
 | `PORT` | No | HTTP port; defaults to `5050`. Render provides this automatically. |
 | `NODE_ENV` | No | Runtime mode; use `production` on Render. |
 | `JWT_EXPIRES_IN` | No | Token lifetime; defaults to `4h`. |
-| `CORS_ORIGIN` | No | Comma-separated allowed origins, such as the GitHub Pages origin and local development origins. |
+| `CORS_ORIGIN` | No | Comma-separated additional allowed origins, such as the GitHub Pages origin. Render automatically adds its `RENDER_EXTERNAL_URL` to the allowlist. |
 | `RATE_LIMIT_WINDOW_MS` | No | Rate-limit window; defaults to 15 minutes. |
 | `RATE_LIMIT_MAX_REQUESTS` | No | General API request limit; defaults to `500`. |
 | `AUTH_RATE_LIMIT_MAX` | No | Authentication request limit; defaults to `50`. |
@@ -251,7 +251,7 @@ To use Pages alongside the Render-hosted app, set the GitHub Actions repository 
 
 The backend build script installs the frontend's locked dependencies (including Vite's build dependencies) and builds `frontend/dist`. The server serves that output at `/`, serves static assets, and falls back to `index.html` for client-side routes. Keep the Render root directory at `backend`; the build runs from there and uses the sibling `frontend` directory.
 
-Configure `MONGODB_URI`, `USE_LOCAL_DB=false`, `JWT_SECRET`, `NODE_ENV=production`, and `CORS_ORIGIN` in the Render service environment. Set `CORS_ORIGIN` to the exact public Render origin (without a trailing slash); add `https://hariss-12.github.io` only if the optional Pages frontend is also used. Render supplies `PORT`. Do not set `VITE_API_URL` for the same-origin Render deployment: the frontend uses `/api` by default.
+Configure `MONGODB_URI`, `USE_LOCAL_DB=false`, `JWT_SECRET`, and `NODE_ENV=production` in the Render service environment. Render supplies `PORT` and `RENDER_EXTERNAL_URL`; the backend adds that exact Render origin to its CORS allowlist. Set `CORS_ORIGIN` only for additional trusted origins, such as `https://hariss-12.github.io` if the optional Pages frontend is also used. Do not set `VITE_API_URL` for the same-origin Render deployment: the frontend uses `/api` by default.
 
 ### Deployment verification
 
