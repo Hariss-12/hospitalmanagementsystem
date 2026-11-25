@@ -237,33 +237,31 @@ These are demo credentials only. Do not retain them in a production deployment.
 
 ### GitHub Pages frontend
 
-The intended Pages URL for this repository is `https://hariss-12.github.io/hospitalmanagementsystem/`. In repository settings, set **Pages → Build and deployment → Source** to **GitHub Actions**. The workflow verifies the configured backend health, doctor list, and DFA definition, then builds `frontend/dist`, sets the repository-specific Vite base path, copies `index.html` to `404.html` for SPA route fallback, and deploys that artifact.
+The optional Pages URL for this repository is `https://hariss-12.github.io/hospitalmanagementsystem/`. In repository settings, set **Pages → Build and deployment → Source** to **GitHub Actions**. The workflow verifies the configured backend health, doctor list, and DFA definition, then builds `frontend/dist`, sets the repository-specific Vite base path, copies `index.html` to `404.html` for SPA route fallback, and deploys that artifact.
 
-Set the GitHub Actions repository variable `RENDER_SERVICE_URL` to the **verified** backend origin (for example, the service's Render origin, without `/api`). The workflow passes it to Vite as `VITE_API_URL`. A Render URL is not hard-coded here because the available service URLs have not been verified to expose this application's API.
+To use Pages alongside the Render-hosted app, set the GitHub Actions repository variable `RENDER_SERVICE_URL` to the Render origin (without `/api`). The workflow passes it to Vite as `VITE_API_URL`; the Render-hosted frontend itself uses relative `/api` requests.
 
-### Render backend
+### Render full-stack service
 
 | Render setting | Value |
 | --- | --- |
 | Root Directory | `backend` |
-| Build Command | `npm ci` |
+| Build Command | `npm ci && npm run build` |
 | Start Command | `npm start` |
 
-The frontend is deployed separately to GitHub Pages; Render runs the backend only. Configure `MONGODB_URI`, `USE_LOCAL_DB=false`, `JWT_SECRET`, `NODE_ENV=production`, and `CORS_ORIGIN` in the Render service environment. Include `https://hariss-12.github.io` as an allowed origin when using the Pages frontend; the origin does not include the repository path. Render supplies `PORT`.
+The backend build script installs the frontend's locked dependencies (including Vite's build dependencies) and builds `frontend/dist`. The server serves that output at `/`, serves static assets, and falls back to `index.html` for client-side routes. Keep the Render root directory at `backend`; the build runs from there and uses the sibling `frontend` directory.
 
-For automated deployment, set the GitHub Actions repository variable `RENDER_SERVICE_URL` to the verified Render origin and the repository secret `RENDER_DEPLOY_HOOK_URL` to that service's deploy hook. The deployment workflow verifies the Hospital DFA service identity, database connection, doctors and DFA APIs, expected unauthenticated responses from appointment/auth/admin routes, and GitHub Pages CORS access.
+Configure `MONGODB_URI`, `USE_LOCAL_DB=false`, `JWT_SECRET`, `NODE_ENV=production`, and `CORS_ORIGIN` in the Render service environment. Set `CORS_ORIGIN` to the exact public Render origin (without a trailing slash); add `https://hariss-12.github.io` only if the optional Pages frontend is also used. Render supplies `PORT`. Do not set `VITE_API_URL` for the same-origin Render deployment: the frontend uses `/api` by default.
 
 ### Deployment verification
 
-Do not treat an HTTP 200 from a generic health page as proof that the correct backend is deployed. Verify that:
+Verify that:
 
-1. `GET ${RENDER_SERVICE_URL}/api/health` returns the Hospital DFA service response, including `success: true` and `database.connected: true`.
-2. `GET ${RENDER_SERVICE_URL}/api/doctors` returns the doctor-list API response rather than a 404.
-3. `GET ${RENDER_SERVICE_URL}/api/dfa/definition` returns this project's DFA definition.
+1. The Render root URL and a nested frontend route return the React application.
+2. `GET /api/health` reports `success: true` and `database.connected: true`.
+3. `GET /api/doctors` and `GET /api/dfa/definition` return this project's API responses.
 4. Protected authentication, appointment, and admin routes return their expected JSON status codes.
-5. The GitHub Pages URL serves the React application, and browser network requests target the verified Render origin.
-
-At the time this documentation was revised, no Render hostname could be verified as serving all of these routes. The service URL must be checked in Render before setting `RENDER_SERVICE_URL`; do not copy a hostname from an older deployment or another project.
+5. Browser API requests use the same Render origin and `/api` path.
 
 ## Testing
 
@@ -283,4 +281,4 @@ cd frontend
 npm run build
 ```
 
-The GitHub Pages workflow supplies `VITE_API_URL` and `VITE_BASE_PATH` during its production build.
+For the optional GitHub Pages deployment, the workflow supplies `VITE_API_URL` and `VITE_BASE_PATH` during its production build.

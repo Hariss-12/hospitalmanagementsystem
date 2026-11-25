@@ -4,6 +4,7 @@
   "description": "Online Hospital Appointment Management System Using Deterministic Finite Automaton (DFA) - Backend API",
   "main": "server.js",
   "scripts": {
+    "build": "npm ci --prefix ../frontend --include=dev && npm run build --prefix ../frontend",
     "start": "node server.js",
     "dev": "node server.js",
     "seed": "node utils/seed.js",
